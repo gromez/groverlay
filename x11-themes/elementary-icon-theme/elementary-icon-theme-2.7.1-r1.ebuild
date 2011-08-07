@@ -38,46 +38,48 @@ src_install() {
 
 	cd "${WORKDIR}"
 	# Sabayon nice stuff
-	for base_dir in fdo-icons-sabayon/*; do
-		[[ -d ${base_dir} ]] || \
-			die "error, ${base_dir} doesn't exist or is not a directory"
-		icon_dir=$(basename "${base_dir}") # example: 128x128
-		dest_icon_dir=${icon_dir}
-		[[ ${icon_dir} != scalable ]] && \
-			dest_icon_dir=${icon_dir/x*} # leave number like "128"
-
-		# under ${base_dir} we have emblems/ and places/
-		[[ -d ${base_dir}/emblems ]] || \
-			die "error, ${base_dir}/emblems doesn't exist or is not a directory"
-		[[ -d ${base_dir}/places ]] || \
-			die "error, ${base_dir}/places doesn't exist or is not a directory"
-
-		# emblems
-		for myfile in "${base_dir}"/emblems/*; do
-			insinto /usr/share/icons/elementary/emblems/"${dest_icon_dir}"
-			doins "${myfile}" || die "can't copy ${myfile}!"
-			if use monochrome; then
-				insinto /usr/share/icons/elementary-mono-dark/emblems/"${dest_icon_dir}"
-				doins "${myfile}" || die "can't copy ${myfile}! (2)"
-			fi
-		done
-
-		# places
-		for myfile in "${base_dir}"/places/*; do
-			insinto /usr/share/icons/elementary/places/"${dest_icon_dir}"
-			doins "${myfile}" || die "can't copy ${myfile}!"
-			dist_logo_symlink \
-				"${myfile}" \
-				"${ED}"usr/share/icons/elementary/places/"${dest_icon_dir}"
-			if use monochrome; then
-				insinto /usr/share/icons/elementary-mono-dark/places/"${dest_icon_dir}"
-				doins "${myfile}" || die "can't copy ${myfile}! (2)"
+	if use branding; then
+		for base_dir in fdo-icons-sabayon/*; do
+			[[ -d ${base_dir} ]] || \
+				die "error, ${base_dir} doesn't exist or is not a directory"
+			icon_dir=$(basename "${base_dir}") # example: 128x128
+			dest_icon_dir=${icon_dir}
+			[[ ${icon_dir} != scalable ]] && \
+				dest_icon_dir=${icon_dir/x*} # leave number like "128"
+			
+			# under ${base_dir} we have emblems/ and places/
+			[[ -d ${base_dir}/emblems ]] || \
+				die "error, ${base_dir}/emblems doesn't exist or is not a directory"
+			[[ -d ${base_dir}/places ]] || \
+				die "error, ${base_dir}/places doesn't exist or is not a directory"
+			
+			# emblems
+			for myfile in "${base_dir}"/emblems/*; do
+				insinto /usr/share/icons/elementary/emblems/"${dest_icon_dir}"
+				doins "${myfile}" || die "can't copy ${myfile}!"
+				if use monochrome; then
+					insinto /usr/share/icons/elementary-mono-dark/emblems/"${dest_icon_dir}"
+					doins "${myfile}" || die "can't copy ${myfile}! (2)"
+				fi
+			done
+			
+			# places
+			for myfile in "${base_dir}"/places/*; do
+				insinto /usr/share/icons/elementary/places/"${dest_icon_dir}"
+				doins "${myfile}" || die "can't copy ${myfile}!"
 				dist_logo_symlink \
 					"${myfile}" \
-					"${ED}"usr/share/icons/elementary-mono-dark/places/"${dest_icon_dir}"
-			fi
+					"${ED}"usr/share/icons/elementary/places/"${dest_icon_dir}"
+				if use monochrome; then
+					insinto /usr/share/icons/elementary-mono-dark/places/"${dest_icon_dir}"
+					doins "${myfile}" || die "can't copy ${myfile}! (2)"
+					dist_logo_symlink \
+						"${myfile}" \
+						"${ED}"usr/share/icons/elementary-mono-dark/places/"${dest_icon_dir}"
+				fi
+			done
 		done
-	done
+	fi
 }
 
 # create symbolic link distributor-logo.{png,…} -> start-here.{png,…}
